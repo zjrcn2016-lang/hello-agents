@@ -1,4 +1,5 @@
 # 增加HF_ENDPOINT，避免Connection aborted. 
+# HF_ENDPOINT 是 HuggingFace Hub 的镜像地址环境变量
 import os
 os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 
@@ -46,6 +47,15 @@ generated_ids = model.generate(
     max_new_tokens=512
 )
 
+
+
+# 解码完整输出（输入 + 回答）
+full_response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+print("\n完整输出（输入+回答）:")
+print(full_response)
+
+
+
 # 将生成的 Token ID 截取掉输入部分
 # 这样我们只解码模型新生成的部分
 generated_ids = [
@@ -55,5 +65,5 @@ generated_ids = [
 # 解码生成的 Token ID
 response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
-print("\n模型的回答:")
+print("\n仅模型回答:")
 print(response)

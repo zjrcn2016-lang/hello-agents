@@ -10,7 +10,7 @@ count_datawhale = tokens.count('datawhale')
 p_datawhale = count_datawhale / total_tokens
 print(f"第一步: P(datawhale) = {count_datawhale}/{total_tokens} = {p_datawhale:.3f}")
 
-# --- 第二步：计算 P(agent|datawhale) ---
+# --- 第二步：计算 P(agent|datawhale) --- 看到datawhale后，agent出现的概率
 # 先计算 bigrams 用于后续步骤
 bigrams = zip(tokens, tokens[1:])
 bigram_counts = collections.Counter(bigrams)
@@ -19,7 +19,7 @@ count_datawhale_agent = bigram_counts[('datawhale', 'agent')]
 p_agent_given_datawhale = count_datawhale_agent / count_datawhale
 print(f"第二步: P(agent|datawhale) = {count_datawhale_agent}/{count_datawhale} = {p_agent_given_datawhale:.3f}")
 
-# --- 第三步：计算 P(learns|agent) ---
+# --- 第三步：计算 P(learns|agent) --- 看到agent后，learns出现的概率
 count_agent_learns = bigram_counts[('agent', 'learns')]
 count_agent = tokens.count('agent')
 p_learns_given_agent = count_agent_learns / count_agent

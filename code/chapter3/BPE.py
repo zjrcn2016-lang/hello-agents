@@ -1,5 +1,9 @@
 import re, collections
 
+
+
+
+# Byte-Pair Encoding, BPE
 def get_stats(vocab):
     """统计词元对频率"""
     pairs = collections.defaultdict(int)
