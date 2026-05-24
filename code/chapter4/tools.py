@@ -3,8 +3,25 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
+import re
 from tavily import TavilyClient
 from typing import Dict, Any
+
+
+def calculate(expression: str) -> str:
+    """
+    安全的数学计算工具，支持加减乘除和括号。
+    """
+    try:
+        # 只允许数字、空格和数学运算符，防止代码注入
+        if not re.match(r'^[\d\s\+\-\*\/\(\)\.]+$', expression):
+            return "错误：只允许数字和 + - * / ( ) 运算符"
+        result = eval(expression)
+        return str(result)
+    except ZeroDivisionError:
+        return "错误：除数不能为零"
+    except Exception as e:
+        return f"计算错误: {e}"
 
 def search(query: str) -> str:
     """
@@ -36,6 +53,10 @@ def search(query: str) -> str:
 
     except Exception as e:
         return f"搜索时发生错误: {e}"
+    
+
+
+
     
 from typing import Dict, Any
 

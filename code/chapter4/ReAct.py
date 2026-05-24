@@ -1,6 +1,6 @@
 import re
 from llm_client import HelloAgentsLLM
-from tools import ToolExecutor, search
+from tools import ToolExecutor, search, calculate
 
 # (此处省略 REACT_PROMPT_TEMPLATE 的定义)
 REACT_PROMPT_TEMPLATE = """
@@ -68,6 +68,9 @@ class ReActAgent:
             print(f"👀 观察: {observation}")
             self.history.append(f"Action: {action}")
             self.history.append(f"Observation: {observation}")
+            print(f"\n📜 当前 history（共 {len(self.history)} 条）:")
+            for i, item in enumerate(self.history):
+                print(f"  [{i}] {item}")
 
         print("已达到最大步数，流程终止。")
         return None
@@ -92,8 +95,10 @@ class ReActAgent:
 if __name__ == '__main__':
     llm = HelloAgentsLLM()
     tool_executor = ToolExecutor()
-    search_desc = "一个网页搜索引擎。当你需要回答关于时事、事实以及在你的知识库中找不到的信息时，应使用此工具。"
-    tool_executor.registerTool("Search", search_desc, search)
+    # search_desc = "一个网页搜索引擎。当你需要回答关于时事、事实以及在你的知识库中找不到的信息时，应使用此工具。"
+    # tool_executor.registerTool("Search", search_desc, search)
+    calc_desc = "一个数学计算器，输入数学表达式（如 (123 + 456) * 789 / 12），返回计算结果。只支持 + - * / 和括号。"
+    tool_executor.registerTool("Calculate", calc_desc, calculate)
     agent = ReActAgent(llm_client=llm, tool_executor=tool_executor)
-    question = "华为最新的手机是哪一款？它的主要卖点是什么？"
+    question = "计算 (123 + 456) × 789 / 12 的结果是多少？"
     agent.run(question)
