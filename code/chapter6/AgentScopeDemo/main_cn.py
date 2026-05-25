@@ -7,6 +7,8 @@ import asyncio
 import os
 import random
 from typing import List, Dict, Optional
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 from agentscope.agent import ReActAgent
 from agentscope.model import DashScopeChatModel
@@ -51,6 +53,9 @@ class ThreeKingdomsWerewolfGame:
         # 女巫道具状态
         self.witch_has_antidote = True
         self.witch_has_poison = True
+
+        # 预言家已查验过的玩家
+        self.seer_checked: set = set()
         
     async def create_player(self, role: str, character: str) -> ReActAgent:
         """创建具有三国背景的玩家"""
@@ -126,7 +131,8 @@ class ThreeKingdomsWerewolfGame:
             self.werewolves,
             enable_auto_broadcast=True,
             announcement=await self.moderator.announce(
-                f"狼人们，请讨论今晚的击杀目标。存活玩家：{format_player_list(self.alive_players)}"
+                f"狼人们，你们的队友是：{format_player_list(self.werewolves)}。"
+                f"请讨论今晚的击杀目标。存活玩家：{format_player_list(self.alive_players)}"
             ),
         ) as werewolves_hub:
             # 讨论阶段
@@ -163,12 +169,23 @@ class ThreeKingdomsWerewolfGame:
         """预言家阶段"""
         if not self.seer:
             return
-            
+
         seer_agent = self.seer[0]
+
+        # 排除已查验过的和已出局的玩家
+        unchecked_players = [
+            p for p in self.alive_players
+            if p.name not in self.seer_checked and p.name != seer_agent.name
+        ]
+
+        if not unchecked_players:
+            print("⚠️ 预言家已查验过所有存活玩家，跳过此阶段")
+            return
+
         await self.moderator.announce("🔮 预言家请睁眼，选择要查验的玩家...")
-        
+
         check_result = await seer_agent(
-            structured_model=get_seer_model_cn(self.alive_players)
+            structured_model=get_seer_model_cn(unchecked_players)
         )
 
         # 检查返回结果是否有效
@@ -181,8 +198,16 @@ class ThreeKingdomsWerewolfGame:
             print(f"⚠️ 预言家未选择查验目标,跳过此阶段")
             return
 
+        # 目标必须在候选列表中（防止 LLM 返回无效名字）
+        if target_name not in {p.name for p in unchecked_players}:
+            print(f"⚠️ 预言家选择了无效目标 {target_name}，跳过此阶段")
+            return
+
+        # 记录已查验
+        self.seer_checked.add(target_name)
+
         target_role = self.roles.get(target_name, "村民")
-        
+
         # 告知预言家结果
         result_msg = f"查验结果：{target_name}是{'狼人' if target_role == '狼人' else '好人'}"
         await seer_agent.observe(await self.moderator.announce(result_msg))

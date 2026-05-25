@@ -35,16 +35,16 @@ pip install pydantic
 
 ```bash
 # Linux/Mac
-export DASHSCOPE_API_KEY="your-api-key-here"
+export DASHSCOPE_API_KEY="sk-036ec3dd92c940c5a91aa1115139cc3c"
 
 # Windows PowerShell
-$env:DASHSCOPE_API_KEY="your-api-key-here"
+$env:DASHSCOPE_API_KEY="sk-036ec3dd92c940c5a91aa1115139cc3c"
 
 # Windows CMD
-set DASHSCOPE_API_KEY=your-api-key-here
+set DASHSCOPE_API_KEY=sk-036ec3dd92c940c5a91aa1115139cc3c
 ```
 
-获取 API Key：https://dashscope.console.aliyun.com/apiKey
+获取 API Key：https://bailian.console.aliyun.com/cn-beijing?tab=model#/api-key
 
 ### 3. 运行游戏
 
